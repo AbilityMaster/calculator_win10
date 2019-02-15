@@ -26,16 +26,14 @@ window.onload = function() {
 		needNewValue = false,
 		needValueForProgressive = false,
 		typeOperation = '',
-		enteredValue = false,
 		maxLength = 10,
-		operationPressedFlag = false,
 		operations = {
 			'+': function() {
 				if (resultPressed)
 					currentValue += ValueForProgressive;
 				else
 					currentValue += +display.innerHTML;
-				trimValue();
+				trimmer();
 				display.innerHTML = currentValue; 
 			},
 			'-': function() {
@@ -43,7 +41,7 @@ window.onload = function() {
 					currentValue -= ValueForProgressive;
 				else
 					currentValue -= +display.innerHTML;
-				trimValue();
+				trimmer();
 				display.innerHTML = currentValue;
 			},
 			'*': function() {
@@ -51,62 +49,55 @@ window.onload = function() {
 					currentValue *= ValueForProgressive;
 				else
 					currentValue *= +display.innerHTML;
-				trimValue();
+				trimmer();
 				display.innerHTML = currentValue; 
 			},
 			'÷': function() {
-				if (resultPressed)
+				if (ValueForProgressive === 0 || +display.innerHTML === 0)
+				{
+					display.innerHTML = 'Деление на 0 невозможно'
+					display.style.fontSize = '20px';
+				}
+				
+				else {
+						if (resultPressed)
 					currentValue /= ValueForProgressive;
 				else 
 					currentValue /= +display.innerHTML;
-				trimValue();
+				trimmer();
 				display.innerHTML = currentValue; 
+				}
+			
 			}
 		};
 
-		function trimValue() {
-			var temp = currentValue,
-			lengthOut = 0,
-			fracLength = 0;
-			if (String(currentValue).length > maxLength) {
-				temp = temp.toExponential();
-				if (temp.length > maxLength) {
-					lengthOut = temp.length - maxLength;
-					fracLength = temp.indexOf('e') - temp.indexOf('.') - 1 - lengthOut;
-					currentValue = currentValue.toExponential(fracLength);
-				} else {
-					currentValue = temp;
-				}
+		function trimmer() {
+			currentValue = +currentValue.toPrecision(6);
+			if (String(currentValue).length > maxLength)
+						currentValue = currentValue.toPrecision(6);
 			}
-		}
 
-		this.clear = function() {
-			display.innerHTML = '0';
-			currentValue = 0;
-			resultPressed = false;
-			operationPressed = false;
-			needNewValue = false;
-			operationPressedFlag = false;
-			typeOperation = '';
-		}
-
-
-		var newv;
-
-		this.addPoint = function(text) {
-			if (text.indexOf('.') == -1 && needNewValue ||
-				text.indexOf('.') == -1 && operationPressedFlag ||
-				text.indexOf('.') == -1 && resultPressed ||
-				text.indexOf('.') !== -1 && needNewValue ||
-				text.indexOf('.') !== -1 && operationPressedFlag ||
-				text.indexOf('.') !== -1 && resultPressed
-				) {
-				display.innerHTML = '0.';
+			this.clear = function() {
+				display.innerHTML = '0';
+				currentValue = 0;
+				resultPressed = false;
+				operationPressed = false;
 				needNewValue = false;
-				//operationPressed = true;
-				//resultPressed = false;
+				typeOperation = '';
+				ValueForProgressive = 0;
+				needValueForProgressive = false;
+			}
+
+			this.addPoint = function(text) {
+				if (text.indexOf('.') === -1 && needNewValue ||
+					text.indexOf('.') === -1 && resultPressed ||
+					text.indexOf('.') !== -1 && needNewValue ||				
+					text.indexOf('.') !== -1 && resultPressed
+					) {
+					display.innerHTML = '0.';
+				needNewValue = false;
 			} else
-			if (text.indexOf('.') == -1) {
+			if (text.indexOf('.') === -1) {
 				display.innerHTML += '.';
 			}
 		}
@@ -116,6 +107,7 @@ window.onload = function() {
 		}
 
 		this.numberPress = function(number) {
+			display.style.fontSize = '45px';
 			if (display.innerHTML === '0.') {
 				display.innerHTML += number;
 				needNewValue = false;
@@ -125,14 +117,12 @@ window.onload = function() {
 				display.innerHTML = number;
 				needNewValue = false;
 				resultPressed = false;
-				operationPressedFlag = false;
 			}
 			else
 				display.innerHTML += number;
 		}
 
 		this.operation = function(operation) {
-			needNewValue = true;
 			needValueForProgressive = true;
 			if (operationPressed) {
 				if (+display.innerHTML !== currentValue) {
@@ -143,7 +133,7 @@ window.onload = function() {
 				currentValue = +display.innerHTML;
 				typeOperation = operation;				
 				operationPressed = true;
-				operationPressedFlag = true;
+				needNewValue = true;
 			}
 		}
 
@@ -154,12 +144,13 @@ window.onload = function() {
 				ValueForProgressive = +display.innerHTML;
 				needValueForProgressive = false;
 			}
-			if (operationPressed || resultPressed) {
+			if ((operationPressed || resultPressed) && currentValue != null) {
 				operations[typeOperation]();
 			}
 
 		}
 	}
+
 	var calc = new Calculator();
 
 	document.querySelector('.calc__button_get-result').onclick = function() {
