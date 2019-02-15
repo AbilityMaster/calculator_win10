@@ -1,5 +1,2 @@
 #dep
 node_modules
-
-#production
-dist
