@@ -1,131 +1,177 @@
-"use strict"
+'use strict'
 
 window.onload = function() {
-	
 	var numbers = document.querySelectorAll('.calc__button_number');
-	var display = document.querySelector('.display');
+	var display = document.querySelector('.display');	
+	var smallDisplay = document.querySelector('.small-display');
 	var operations = document.querySelectorAll('.calc__button_operation');
 
 	numbers.forEach(function(element){
 		element.addEventListener('click', function() {
-			numberPress(this.innerHTML);
+			calc.numberPress(this.innerHTML);
 		});
-	})
-
-	document.querySelector('.calc__button_clear').onclick = function () {
-		document.querySelector('.display').innerHTML = '';
-		delete calc.result;
-		delete calc.b;
-		delete calc.textTable;
-		delete calc.operation;
-		delete calc.endOfOperations;
-		delete calc.isnewValueInDisplay;
-	}
-
-	
-	function numberPress(number) {
-		if (display.innerHTML === '0') 
-			display.innerHTML = number;
-		else
-			display.innerHTML += number;
-	};
-
-
-
-	function Calculator() {
-		var self = this;
-		var operations = {
-			'+': function() {
-				document.querySelector('.display').innerHTML = self.result + self.b;
-			},
-			'-': function() {
-				document.querySelector('.display').innerHTML = self.result - self.b;
-			},
-			'*': function() {
-				document.querySelector('.display').innerHTML = self.result * self.b;
-			},
-			'÷': function() {
-				if (self.b == 0) {
-					document.querySelector('.display').innerHTML = 'Деление на 0 невозможно';
-					document.querySelector('.display').style.fontSize = '22px';
-				}
-				else
-				document.querySelector('.display').innerHTML = (self.result / self.b).toFixed(10);
-			},
-			'pow': function() {
-				document.querySelector('.display').innerHTML = Math.pow()
-			}
-		}
-
-		this.addPoint = function(textTable) {
-			if (textTable.indexOf('.') == -1) {
-				this.textTable = textTable + '.';
-			}
-		}
-
-		this.pressOperation = function(operation) {
-			if (this.activateOperation) {
-					if (!calc.isnewValueInDisplay) {
-						this.b = +document.querySelector('.display').innerHTML;
-						if (this.b != 0 && this.operation != '%')
-						operations[this.operation]();
-						document.querySelector('.small-display').innerHTML += this.result + ' ' +this.operation;
-						this.activateOperation = false;
-				}
-					this.operation = operation;
-			} else {
-				this.result = +document.querySelector('.display').innerHTML;
-				this.operation = operation;
-				this.activateOperation = true;
-				this.isnewValueInDisplay = true;
-				document.querySelector('.small-display').innerHTML += this.result + '  ' +this.operation;
-				delete this.b;
-			}
-		};
-
-		this.negate = function(data) {
-			this.textTable = +data * -1;
-		}
-
-		this.getResult = function() {
-			document.querySelector('.small-display').innerHTML = '';
-			if (!this.b) {
-				this.b = +document.querySelector('.display').innerHTML;
-				if (this.b != 0 && this.operation != '%')
-				operations[this.operation]();					
-				this.activateOperation = false;
-				this.endOfOperations = true;				
-			} else {
-				this.result = +document.querySelector('.display').innerHTML;
-				operations[this.operation]();
-				this.activateOperation = false;
-				this.endOfOperations = true;
-			}
-		}
-	}
-
-	var calc = new Calculator();
-
-
-	var es = document.querySelectorAll('.calc__button_operation');
-	es.forEach(function(element){
+	});
+	operations.forEach(function(element){
 		element.addEventListener('click', function() {
-			calc.pressOperation(this.innerHTML);
+			calc.operation(this.innerHTML);
 		});
 	});
 
-	document.querySelector('.calc__button_get-result').onclick = function () {
-		calc.getResult();
-	}
+	function Calculator() {
+		var self = this,
+		ValueForProgressive = 0,
+		currentValue = 0,
+		resultPressed = false,
+		operationPressed = false,
+		needNewValue = false,
+		needValueForProgressive = false,
+		typeOperation = '',
+		enteredValue = false,
+		maxLength = 10,
+		operationPressedFlag = false,
+		operations = {
+			'+': function() {
+				if (resultPressed)
+					currentValue += ValueForProgressive;
+				else
+					currentValue += +display.innerHTML;
+				trimValue();
+				display.innerHTML = currentValue; 
+			},
+			'-': function() {
+				if (resultPressed)
+					currentValue -= ValueForProgressive;
+				else
+					currentValue -= +display.innerHTML;
+				trimValue();
+				display.innerHTML = currentValue;
+			},
+			'*': function() {
+				if (resultPressed)
+					currentValue *= ValueForProgressive;
+				else
+					currentValue *= +display.innerHTML;
+				trimValue();
+				display.innerHTML = currentValue; 
+			},
+			'÷': function() {
+				if (resultPressed)
+					currentValue /= ValueForProgressive;
+				else 
+					currentValue /= +display.innerHTML;
+				trimValue();
+				display.innerHTML = currentValue; 
+			}
+		};
 
-	document.querySelector('.calc__button_add-point').onclick = function () {
-		calc.addPoint(document.querySelector('.display').innerHTML);
-		document.querySelector('.display').innerHTML = calc.textTable;
-	}
+		function trimValue() {
+			var temp = currentValue,
+			lengthOut = 0,
+			fracLength = 0;
+			if (String(currentValue).length > maxLength) {
+				temp = temp.toExponential();
+				if (temp.length > maxLength) {
+					lengthOut = temp.length - maxLength;
+					fracLength = temp.indexOf('e') - temp.indexOf('.') - 1 - lengthOut;
+					currentValue = currentValue.toExponential(fracLength);
+				} else {
+					currentValue = temp;
+				}
+			}
+		}
 
-	document.querySelector('.calc__button_reverse').onclick = function () {
-		calc.negate(document.querySelector('.display').innerHTML);
-		document.querySelector('.display').innerHTML = calc.textTable;
-	}
+		this.clear = function() {
+			display.innerHTML = '0';
+			currentValue = 0;
+			resultPressed = false;
+			operationPressed = false;
+			needNewValue = false;
+			operationPressedFlag = false;
+			typeOperation = '';
+		}
 
+
+		var newv;
+
+		this.addPoint = function(text) {
+			if (text.indexOf('.') == -1 && needNewValue ||
+				text.indexOf('.') == -1 && operationPressedFlag ||
+				text.indexOf('.') == -1 && resultPressed ||
+				text.indexOf('.') !== -1 && needNewValue ||
+				text.indexOf('.') !== -1 && operationPressedFlag ||
+				text.indexOf('.') !== -1 && resultPressed
+				) {
+				display.innerHTML = '0.';
+				needNewValue = false;
+				//operationPressed = true;
+				//resultPressed = false;
+			} else
+			if (text.indexOf('.') == -1) {
+				display.innerHTML += '.';
+			}
+		}
+
+		this.negate = function(data) {
+			display.innerHTML = +data * -1;
+		}
+
+		this.numberPress = function(number) {
+			if (display.innerHTML === '0.') {
+				display.innerHTML += number;
+				needNewValue = false;
+				resultPressed = false;
+			} else
+			if ((display.innerHTML === '0' || (needNewValue) || (resultPressed))) {
+				display.innerHTML = number;
+				needNewValue = false;
+				resultPressed = false;
+				operationPressedFlag = false;
+			}
+			else
+				display.innerHTML += number;
+		}
+
+		this.operation = function(operation) {
+			needNewValue = true;
+			needValueForProgressive = true;
+			if (operationPressed) {
+				if (+display.innerHTML !== currentValue) {
+					operations[typeOperation]();
+				}
+				typeOperation = operation;
+			} else {
+				currentValue = +display.innerHTML;
+				typeOperation = operation;				
+				operationPressed = true;
+				operationPressedFlag = true;
+			}
+		}
+
+		this.result = function() {
+			resultPressed = true;
+			operationPressed = false;
+			if (needValueForProgressive) {
+				ValueForProgressive = +display.innerHTML;
+				needValueForProgressive = false;
+			}
+			if (operationPressed || resultPressed) {
+				operations[typeOperation]();
+			}
+
+		}
+	}
+	var calc = new Calculator();
+
+	document.querySelector('.calc__button_get-result').onclick = function() {
+		calc.result();
+	}
+	document.querySelector('.calc__button_add-point').onclick = function() {
+		calc.addPoint(display.innerHTML);
+	}
+	document.querySelector('.calc__button_reverse').onclick = function() {
+		calc.negate(display.innerHTML);
+	}
+	document.querySelector('.calc__button_clear').onclick = function() {
+		calc.clear();
+	}
 }
