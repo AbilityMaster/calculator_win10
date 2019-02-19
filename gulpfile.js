@@ -8,7 +8,7 @@ var config = {
 	server: {
 		baseDir: "./dist"
 	},
-//	tunnel: true,
+	tunnel: true,
 	host: 'localhost',
 	port: 3000,
 	browser: 'default',
@@ -40,36 +40,9 @@ var path = {
 };
 
 
-function prod_html() {
-	return gulp.src(path.src.html)
-			.pipe(gulp.dest(path.build.html));
-}
-function prod_css() {
-	return gulp.src(path.src.css)
-		.pipe(sass({outputStyle: 'compressed'}).on('error', sass.logError))
-		.pipe(gulp.dest(path.build.css))
-}
-function prod_js() {
-	return gulp.src(path.src.js)
-			.pipe(gulp.dest(path.build.js));
-}
-function prod_fonts() {
-	return gulp.src(path.src.fonts)
-			.pipe(gulp.dest(path.build.fonts));
-}
-function prod_img() {
-	return gulp.src(path.src.img)
-			.pipe(gulp.dest(path.build.img));
-}
 
 function start_server() {
 	browserSync.init(config);
-
-	prod_html();
-	prod_css();
-	prod_js();
-	prod_fonts();
-	prod_img();
 
 	gulp.watch(path.watch.html).on("change", function() {
 		return gulp.src(path.src.html)
