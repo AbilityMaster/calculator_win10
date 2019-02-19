@@ -11,7 +11,7 @@ var config = {
 //	tunnel: true,
 	host: 'localhost',
 	port: 3000,
-	browser: 'opera',
+	browser: 'default',
 	logPrefix: "frontend_2k19"
 };
 

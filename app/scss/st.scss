@@ -1,5 +1,4 @@
-$background-color___calc__button: #f5f5f5;
-$background-color___calc__button_number: #fdfdfd;
+@import 'var';
 
 body, html {
 	margin: 0;
@@ -28,7 +27,7 @@ body, html {
 .index-menu {
 	margin: 0;
 	padding-left: 10px;
-	font-size: 13px;
+	font-size: $font-size__index-menu;
 	display: -webkit-flex;
 	display: flex; 
 	align-items: center;
@@ -81,7 +80,7 @@ body, html {
 	text-align: right;
 	font-weight: 600;
 	line-height: 50px;
-	font-size: 45px;
+	font-size: $font-size__display;
 	padding: 20px 10px;
 }
 
@@ -91,7 +90,7 @@ body, html {
 
 .calc-add {
 	&__button {
-		font-size: 13px;
+		font-size: $font-size__calc-add__button;
 		font-weight: 600;
 		width: 100%;
 		height: 30px;
@@ -111,21 +110,27 @@ body, html {
 		background: $background-color___calc__button;
 		width: 100px;
 		height: 50px;
-		font-size: 18px;
+		font-size: $font-size__calc__button;
 		line-height: 50px;
 		text-align: center;
 		margin: 1px;
-		&:hover {
+		&_disabled:hover {
+			cursor: default;
+		}
+		&_enabled:hover {
+			cursor: pointer;
 			background: #dbdbdb;
 			outline: 1px solid #bcbbbb;
-			cursor: pointer;
+		}
+		&_disabled {
+			color: rgba(0,0,0,0.15);
 		}
 		&_number {
 			font-weight: 600;
-			font-size: 24px;
+			font-size: $font-size__calc__button_number;
 			background: $background-color___calc__button_number;
 		}
-		&_frac span {
+		&_frac .span {
 			position: relative;
 			&::before {
 				content: '1';
@@ -142,7 +147,7 @@ body, html {
 				right: -6px;
 			}
 		}
-		&_pow span {
+		&_pow .span {
 			position: relative;
 			font-style: italic;
 			&::before {
