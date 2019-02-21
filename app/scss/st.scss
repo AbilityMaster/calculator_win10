@@ -72,8 +72,15 @@ body, html {
 
 .small-display {
 	height: 20px;
+	opacity: 0.5;
+	position: relative;
+	overflow: hidden;
 	text-align: right;
-	padding: 0 10px;
+	margin: 0 10px;
+	&__block {
+		position: absolute;
+		right: 0;
+	}
 }
 .display {
 	height: 50px;
