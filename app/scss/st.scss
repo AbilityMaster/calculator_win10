@@ -70,16 +70,57 @@ body, html {
 	}
 }
 
+.group-small-display {
+	position: relative;
+	display: flex;
+	align-items: center;
+}
 .small-display {
 	height: 20px;
 	opacity: 0.5;
 	position: relative;
 	overflow: hidden;
 	text-align: right;
-	margin: 0 10px;
+	width: 100%;
+	margin: 0 17px;
 	&__block {
 		position: absolute;
 		right: 0;
+		line-height: 20px;
+		height: 20px;
+	}
+	&__add {
+		visibility: hidden;
+		position: absolute;
+		right: 0;
+		height: 20px;
+	}
+	&__button {
+		position: absolute;
+		height: 100%;
+		width: 20px;
+		&_left {
+			left: 0;
+			background: url('../img/left.png');
+			background-size: cover;
+			visibility: hidden;
+			&:hover {
+				background: url('../img/left-hov.png') #d0d0d0;
+				background-size: cover;
+				cursor: pointer;
+			}
+		}
+		&_right {
+			right: 0;
+			background: url('../img/right.png');
+			background-size: cover;
+			visibility: hidden;
+			&:hover {
+				background: url('../img/right-hov.png') #d0d0d0;
+				background-size: cover;
+				cursor: pointer;
+			}
+		}
 	}
 }
 .display {

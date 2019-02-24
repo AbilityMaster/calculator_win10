@@ -4,6 +4,7 @@ window.onload = function() {
 	var numbers = document.querySelectorAll('.calc__button_number'),
 	display = document.querySelector('.display'),
 	smallDisplay = document.querySelector('.small-display__block'),
+	hiddenDisplay = document.querySelector('.small-display__add'),
 	operationList = document.querySelectorAll('.calc__button_operation'),
 	reverse = document.querySelector('.calc__button_reverse'),
 	point = document.querySelector('.calc__button_add-point'),
@@ -11,16 +12,22 @@ window.onload = function() {
 	percent = document.querySelector('.calc__button_percent'),
 	sqrt = document.querySelector('.calc__button_sqrt'),
 	pow = document.querySelector('.calc__button_pow'),
-	frac = document.querySelector('.calc__button_frac');
+	frac = document.querySelector('.calc__button_frac'),
+	arrowLeft = document.querySelector('.small-display__button_left'),
+	arrowRight = document.querySelector('.small-display__button_right');
 
 	numbers.forEach(function(element){
 		element.addEventListener('click', function() {
 			calc.numberPress(this.innerHTML);
+			smallDisplay.style.removeProperty('left');
+			smallDisplay.style.right = 0;
 		});
 	});
 	operationList.forEach(function(element){
 		element.addEventListener('click', function() {
 			calc.operation(this.innerHTML);
+			smallDisplay.style.removeProperty('left');
+			smallDisplay.style.right = 0;
 		});
 	});
 
@@ -73,10 +80,12 @@ window.onload = function() {
 		this.resultPressed = false;
 		this.operationPressed = false;
 		this.needNewValue = false;
+		this.valueArray = [];
 		this.needValueForProgressive = false;
 		this.enteredNewValue = false;
 		this.typeOperation = '';
-		this.maxLength = 10;
+		this.pressedSingleOperation = false;
+		this.maxLength = 11;
 		this.singleFunction = false;
 		this.operations = {
 			disabled: false, 
@@ -85,7 +94,6 @@ window.onload = function() {
 					self.currentValue += self.ValueForProgressive;
 				}
 				else {
-					console.log(self.currentValue);
 					self.currentValue += parseFloat(display.innerHTML);
 				}
 
@@ -129,28 +137,39 @@ window.onload = function() {
 				} 
 			},
 			'POW': function() {
-				self.currentValue = Math.pow(self.currentValue,2);
-				display.innerHTML = self.trimmer(self.currentValue);
+				display.innerHTML = self.trimmer(Math.pow(parseFloat(display.innerHTML),2));
 			},
 			'FRAC': function() {
-				self.currentValue = 1 / self.currentValue;
-				display.innerHTML = self.trimmer(self.currentValue);
+				display.innerHTML = self.trimmer(1 / parseFloat(display.innerHTML));
 			},
 			'SQRT': function() {
-				self.currentValue = Math.sqrt(self.currentValue);
-				display.innerHTML = self.trimmer(self.currentValue);
+				display.innerHTML = self.trimmer(Math.sqrt(parseFloat(display.innerHTML)));
+			},
+			'NEGATE': function() {
+				display.innerHTML = self.trimmer(parseFloat(display.innerHTML) * -1);
+			},
+			'PERCENT': function() {
+				if (!currentValue) {
+					display.innerHTML = 0;
+					return;
+				}
+				return self.trimmer(parseFloat(display.innerHTML)/100*currentValue);
+			},
+			nameOp: {
+				'POW': 'sqr',
+				'FRAC': '1/',
+				'SQRT': '√',
+				'NEGATE': 'negate'
 			}
-
-
 		}
 	}
 
 	Calculator.prototype.trimmer = function(temp) {
-		temp = +temp.toPrecision(6);
+		temp = parseFloat(temp)
+		temp.toPrecision(6);
 		if (String(temp).length > this.maxLength) {
 			temp = temp.toPrecision(6);
 		}
-
 		return temp;
 	}
 
@@ -163,7 +182,7 @@ window.onload = function() {
 
 		if (display.innerHTML === 'Деление на 0 невозможно') {
 			display.style.fontSize = '45px';
-			Calculator.prototype.operations.disabled = false;
+			this.operations.disabled = false;
 			display.innerHTML = '0';
 			activateButtons();
 			return;
@@ -173,13 +192,17 @@ window.onload = function() {
 	}
 
 	Calculator.prototype.clear = function() {
-		if (Calculator.prototype.operations.disabled) {
+		if (this.operations.disabled) {
 			display.style.fontSize = '45px';
-			Calculator.prototype.operations.disabled = false;
+			this.operations.disabled = false;
 			activateButtons();
 		}
 
 		display.innerHTML = '0';
+		smallDisplay.innerHTML = '';
+		smallDisplay.style.width = '';
+		arrowLeft.style.visibility = 'hidden';
+		arrowRight.style.visibility = 'hidden';
 		this.currentValue = undefined;
 		this.resultPressed = false;
 		this.operationPressed = false;
@@ -190,6 +213,44 @@ window.onload = function() {
 		this.enteredNewValue = false;
 		this.singleFunction = false;
 		smallDisplay.innerHTML = '';
+		this.valueArray = [];
+	}
+
+	Calculator.prototype.singleOperation = function(operation) {
+		if (this.operations.disabled) {
+			return;
+		}
+		if (!this.pressedSingleOperation) {
+			this.data = smallDisplay.innerHTML;
+			if (operation === 'PERCENT') {
+				this.valueArray.push(this.operations[operation]());
+				smallDisplay.innerHTML += this.valueArray[this.valueArray.length-1];
+			} else {
+				this.valueArray.push(this.operations.nameOp[operation] + '('+ display.innerHTML +')');
+				smallDisplay.innerHTML += ' ' + this.operations.nameOp[operation] + '('+ display.innerHTML +')';
+			}
+		} 
+		if (this.pressedSingleOperation) {
+			if (operation === 'PERCENT') {
+				this.valueArray[this.valueArray.length-1] = this.operations[operation]();
+				smallDisplay.innerHTML = this.data + this.valueArray[this.valueArray.length - 1];
+			} else {
+				this.valueArray[this.valueArray.length-1] = this.operations.nameOp[operation] + '(' + this.valueArray[this.valueArray.length - 1] + ')';
+				smallDisplay.innerHTML = this.data + ' ' + this.valueArray[this.valueArray.length - 1] + ' ';
+			}
+		}
+
+		this.pressedSingleOperation = true;
+		this.singleFunction = false;
+		this.needNewValue = true;
+		this.enteredNewValue = true;
+
+		if (operation === 'PERCENT') {
+			display.innerHTML = this.operations[operation]();
+			return;
+		}
+
+		this.operations[operation]();
 	}
 
 	Calculator.prototype.result = function() {
@@ -218,31 +279,31 @@ window.onload = function() {
 			return;
 		}
 
-		this.stroke = ' '+display.innerHTML + ' ' + operation;
-
-		if (this.enteredNewValue) {
-			if (smallDisplay.offsetWidth > 280) {
-				smallDisplay.style.width = 1000;
+		if (this.enteredNewValue && this.pressedSingleOperation) {
+			this.valueArray.push(operation);
+			hiddenDisplay.innerHTML = '&nbsp;' + this.valueArray[this.valueArray.length-2] + ' ' + this.valueArray[this.valueArray.length-1] + '&nbsp;';
+			if ((smallDisplay.clientWidth + hiddenDisplay.clientWidth) >= 286) {
+				arrowLeft.style.visibility = 'visible';
+				arrowRight.style.visibility = 'visible';
+				smallDisplay.style.width = smallDisplay.clientWidth + hiddenDisplay.clientWidth;
 			}
-			smallDisplay.innerHTML += this.stroke;
-		} else {
-			if (parseFloat(display.innerHTML) === 0) {
-				smallDisplay.innerHTML = '0 ' + operation; 
+			smallDisplay.innerHTML += this.valueArray[this.valueArray.length-1];
+		} else if (this.enteredNewValue) {
+			this.valueArray.push(display.innerHTML);
+			this.valueArray.push(operation);
+			hiddenDisplay.innerHTML = '&nbsp;' + this.valueArray[this.valueArray.length-2] + ' ' + this.valueArray[this.valueArray.length-1] + '&nbsp;';
+			if ((smallDisplay.clientWidth + hiddenDisplay.clientWidth) >= 286) {
+				arrowLeft.style.visibility = 'visible';
+				arrowRight.style.visibility = 'visible';
+				smallDisplay.style.width = smallDisplay.clientWidth + hiddenDisplay.clientWidth;
 			}
-			smallDisplay.innerHTML = smallDisplay.innerHTML.slice(0,smallDisplay.innerHTML.length-1) + operation;
+			smallDisplay.innerHTML += ' ' + this.valueArray[this.valueArray.length-2];
+			smallDisplay.innerHTML += ' ' + this.valueArray[this.valueArray.length-1];
 		}
-
-		if (this.singleFunction) {
-			this.currentValue = parseFloat(display.innerHTML);
-			this.typeOperation = operation;		
-			this.operations[this.typeOperation]();
-			this.singleFunction = false;
-			this.needNewValue = true;
-			this.enteredNewValue = false;
-			this.currentValue = 0;
-			return;
-		}
-
+		
+		this.valueArray[this.valueArray.length - 1] = operation;	
+		smallDisplay.innerHTML = smallDisplay.innerHTML.slice(0,smallDisplay.innerHTML.length-1) + this.valueArray[this.valueArray.length-1];
+		this.pressedSingleOperation = false;
 		this.needValueForProgressive = true;
 
 		if (this.operationPressed) {
@@ -253,115 +314,120 @@ window.onload = function() {
 			this.typeOperation = operation;
 		} else {
 			this.currentValue = parseFloat(display.innerHTML);
-
 			this.typeOperation = operation;				
 			this.operationPressed = true;
-				this.enteredNewValue = false; // 
-			}
-
-			this.needNewValue = true;
+			this.enteredNewValue = false; 
 		}
 
-		Calculator.prototype.addPoint = function(text) {
-			if (this.operations.disabled) {
-				return;
-			}
-
-			if (text.indexOf('.') === -1 && this.needNewValue ||
-				text.indexOf('.') === -1 && this.resultPressed ||
-				text.indexOf('.') !== -1 && this.needNewValue ||				
-				text.indexOf('.') !== -1 && this.resultPressed
-				) {
-				display.innerHTML = '0.';
-			this.needNewValue = false;
-			return;
-		} 
-
-		if (text.indexOf('.') === -1) {
-			display.innerHTML += '.';
-		}
+		this.needNewValue = true;
 	}
 
-	Calculator.prototype.negate = function(data) {
+	Calculator.prototype.addPoint = function(text) {
 		if (this.operations.disabled) {
 			return;
 		}
 
-		display.innerHTML = +data * -1;
+		if (text.indexOf('.') === -1 && this.needNewValue ||
+			text.indexOf('.') === -1 && this.resultPressed ||
+			text.indexOf('.') !== -1 && this.needNewValue ||				
+			text.indexOf('.') !== -1 && this.resultPressed) {
+			display.innerHTML = '0.';
+		this.needNewValue = false;
+		return;
+	} 
+
+	if (text.indexOf('.') === -1) {
+		display.innerHTML += '.';
+	}
+}
+
+Calculator.prototype.numberPress = function(number) {
+	if (this.operations.disabled) {
+		this.operations.disabled = false;
+		this.clear();
+		activateButtons();
 	}
 
-	Calculator.prototype.percent = function() {
-		if (this.operations.disabled) {
+	this.enteredNewValue = true;
+	display.style.fontSize = '45px';
+
+	if (display.innerHTML === '0.') {
+		display.innerHTML += number;
+		this.needNewValue = false;
+		this.resultPressed = false;
+		return;
+	}
+
+	if ((display.innerHTML === '0' || (this.needNewValue) || (this.resultPressed) || display.innerHTML === 'Деление на 0 невозможно')) {
+		display.innerHTML = number;
+		this.needNewValue = false;
+		this.resultPressed = false;
+		this.pressedSingleOperation = false;
+	} else {
+		if (display.innerHTML.length > this.maxLength) {
 			return;
 		}
-
-		if (!this.currentValue) {
-			display.innerHTML = 0;
-			return;
-		}
-
-		var temp = parseFloat(display.innerHTML)/100*this.currentValue;
-		display.innerHTML = trimmer(temp);
+		display.innerHTML += number;
 	}
 
-	Calculator.prototype.numberPress = function(number) {
-		if (this.operations.disabled) {
-			this.operations.disabled = false;
-			this.clear();
-			activateButtons();
-		}
+}
 
-		this.enteredNewValue = true;
-		display.style.fontSize = '45px';
+var calc = new Calculator();
 
-		if (display.innerHTML === '0.') {
-			display.innerHTML += number;
-			this.needNewValue = false;
-			this.resultPressed = false;
-			return;
-		}
+document.querySelector('.calc__button_get-result').onclick = function() {
+	calc.result();
+}
+document.querySelector('.calc__button_add-point').onclick = function() {	
+	smallDisplay.style.removeProperty('left');
+	smallDisplay.style.right = 0;
+	calc.addPoint(display.innerHTML);
+}
+document.querySelector('.calc__button_reverse').onclick = function() {		
+	smallDisplay.style.removeProperty('left');
+	smallDisplay.style.right = 0;
+	calc.singleOperation('NEGATE');
+}
+document.querySelector('.calc__button_clear').onclick = function() {
+	calc.clear();
+}
+document.querySelector('.calc__button_pow').onclick = function() {
+	smallDisplay.style.removeProperty('left');
+	smallDisplay.style.right = 0;
+	calc.singleOperation('POW');
+}
+document.querySelector('.calc__button_frac').onclick = function() {
+	calc.singleOperation('FRAC');
+	smallDisplay.style.removeProperty('left');
+	smallDisplay.style.right = 0;
+}
+document.querySelector('.calc__button_sqrt').onclick = function() {
+	calc.singleOperation('SQRT');
+	smallDisplay.style.removeProperty('left');
+	smallDisplay.style.right = 0;
+}
 
-		if ((display.innerHTML === '0' || (this.needNewValue) || (this.resultPressed) || display.innerHTML === 'Деление на 0 невозможно')) {
-			display.innerHTML = number;
-			this.needNewValue = false;
-			this.resultPressed = false;
-		} else {
-			display.innerHTML += number;
-		}
-		
+document.querySelector('.calc__button_percent').onclick = function() {
+	calc.singleOperation('PERCENT');
+	smallDisplay.style.removeProperty('left');
+	smallDisplay.style.right = 0;
+}
+document.querySelector('.calc__button_backspace').onclick = function() {
+	calc.backspace();
+}
+document.querySelector('.small-display__button_left').onclick = function() {
+	if (smallDisplay.clientWidth > 286) {
+		smallDisplay.style.removeProperty('right');
+		smallDisplay.style.left = 0;
+	} else {
+		return;
 	}
-
-	var calc = new Calculator();
-
-	document.querySelector('.calc__button_get-result').onclick = function() {
-		calc.result();
+}
+document.querySelector('.small-display__button_right').onclick = function() {
+	if (smallDisplay.clientWidth > 286) {
+		smallDisplay.style.removeProperty('left');
+		smallDisplay.style.right = 0;
+	} else {
+		return;
 	}
-	document.querySelector('.calc__button_add-point').onclick = function() {
-		calc.addPoint(display.innerHTML);
-	}
-	document.querySelector('.calc__button_reverse').onclick = function() {
-		calc.negate(display.innerHTML);
-	}
-	document.querySelector('.calc__button_clear').onclick = function() {
-		calc.clear();
-	}
-	document.querySelector('.calc__button_pow').onclick = function() {
-		calc.singleFunction = true;
-		calc.operation('POW');
-	}
-	document.querySelector('.calc__button_frac').onclick = function() {
-		calc.singleFunction = true;
-		calc.operation('FRAC');
-	}
-	document.querySelector('.calc__button_sqrt').onclick = function() {
-		calc.singleFunction = true;
-		calc.operation('SQRT');
-	}
-
-	document.querySelector('.calc__button_percent').onclick = function() {
-		calc.percent();
-	}
-	document.querySelector('.calc__button_backspace').onclick = function() {
-		calc.backspace();
-	}
+}
 }
