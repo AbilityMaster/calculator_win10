@@ -209,12 +209,12 @@ window.onload = function() {
 	}
 
 	function Calculator() {
-		var self = this;
 		this.operationsDisabled = false;
 		this.resultPressed = false;
 		this.operationPressed = false;
 		this.needNewValue = false;
 		this.valueArray = [];
+		this.currentValue = null;
 		this.needValueForProgressive = false;
 		this.enteredNewValue = false;
 		this.typeOperation = '';
@@ -267,12 +267,11 @@ window.onload = function() {
 		hiddenDisplay.style.width = '';
 		arrowLeft.style.visibility = 'hidden';
 		arrowRight.style.visibility = 'hidden';
-		this.currentValue = undefined;
+		this.currentValue = null;
 		this.resultPressed = false;
 		this.operationPressed = false;
 		this.needNewValue = false;
 		this.typeOperation = '';
-		this.ValueForProgressive = undefined;
 		this.needValueForProgressive = false,
 		this.enteredNewValue = false;
 		this.singleFunction = false;
@@ -342,8 +341,8 @@ window.onload = function() {
 			this.ValueForProgressive = parseFloat(display.innerHTML);
 			this.needValueForProgressive = false;
 		}
-
-		if ((this.operationPressed || this.resultPressed) && this.currentValue !== undefined) {
+		
+		if ((this.operationPressed || this.resultPressed) && this.currentValue !== null) {
 			this[this.typeOperation]();
 		}
 
