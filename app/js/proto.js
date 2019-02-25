@@ -153,6 +153,13 @@ window.onload = function() {
 			display.innerHTML = this.trimmer(Math.pow(parseFloat(display.innerHTML),2));
 		},
 		'FRAC': function() {
+			if (parseFloat(display.innerHTML) === 0)	{	
+				this.operationsDisabled = true;
+				disableButtons();
+				display.style.fontSize = '20px';
+				display.innerHTML = 'Деление на 0 невозможно';
+				return;
+			} 
 			var temp = 1 / parseFloat(display.innerHTML)
 			if (!isFinite(temp)) {
 				disableButtons();
@@ -164,6 +171,13 @@ window.onload = function() {
 			display.innerHTML = this.trimmer(temp);
 		},
 		'SQRT': function() {
+			if (parseFloat(display.innerHTML) < 0) {
+				disableButtons();
+				display.style.fontSize = '20px';
+				display.innerHTML = 'Введены неверные данные';
+				this.operationsDisabled = true;
+				return;
+			}
 			var temp = Math.sqrt(parseFloat(display.innerHTML));
 			if (!isFinite(temp)) {
 				disableButtons();
@@ -242,7 +256,8 @@ window.onload = function() {
 			return;
 		}
 
-		if (display.innerHTML === 'Деление на 0 невозможно' || display.innerHTML === 'Переполнение') {
+		if (display.innerHTML === 'Деление на 0 невозможно' || display.innerHTML === 'Переполнение' || display.innerHTML === 'Введены неверные данные') {
+			smallDisplay.innerHTML = '';
 			display.style.fontSize = '45px';
 			this.operationsDisabled = false;
 			display.innerHTML = '0';
