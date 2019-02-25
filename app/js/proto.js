@@ -73,10 +73,144 @@ window.onload = function() {
 		});
 	}
 
+	var	operations = {
+		'+': function() {
+			if (this.resultPressed) {
+				this.currentValue += this.ValueForProgressive;
+			}
+			else {
+				this.currentValue += parseFloat(display.innerHTML);
+			}
+			if (!isFinite(this.currentValue)) {
+				disableButtons();
+				display.style.fontSize = '20px';
+				display.innerHTML = 'Переполнение';
+				this.operationsDisabled = true;
+				return;
+			}
+			display.innerHTML = this.trimmer(this.currentValue);
+		},
+		'-': function() {
+			if (this.resultPressed) {
+				this.currentValue -= this.ValueForProgressive;
+			}
+			else {
+				this.currentValue -= parseFloat(display.innerHTML);
+			}
+			if (!isFinite(this.currentValue)) {
+				disableButtons();
+				display.style.fontSize = '20px';
+				display.innerHTML = 'Переполнение';
+				this.operationsDisabled = true;
+				return;
+			}
+			display.innerHTML = this.trimmer(this.currentValue);
+		},
+		'*': function() {
+			if (this.resultPressed) {
+				this.currentValue *= this.ValueForProgressive;
+			}
+			else {
+				this.currentValue *= parseFloat(display.innerHTML);
+			}
+			if (!isFinite(this.currentValue)) {
+				disableButtons();
+				display.style.fontSize = '20px';
+				display.innerHTML = 'Переполнение';
+				this.operationsDisabled = true;
+				return;
+			}
+			display.innerHTML = this.trimmer(this.currentValue);
+		},
+		'÷': function() {
+			if (this.ValueForProgressive === 0 || parseFloat(display.innerHTML) === 0)
+			{	
+				this.operationsDisabled = true;
+				disableButtons();
+				display.style.fontSize = '20px';
+				display.innerHTML = 'Деление на 0 невозможно';
+				return;
+			} 
+
+			if (this.resultPressed) {
+				this.currentValue /= this.ValueForProgressive;
+			}
+			else {
+				this.currentValue /= +display.innerHTML;
+			}
+
+			display.innerHTML = this.trimmer(this.currentValue);
+		},
+		'POW': function() {
+			var temp = Math.pow(parseFloat(display.innerHTML),2);
+			if (!isFinite(temp)) {
+				disableButtons();
+				display.style.fontSize = '20px';
+				display.innerHTML = 'Переполнение';
+				this.operationsDisabled = true;
+				return;
+			}
+			display.innerHTML = this.trimmer(Math.pow(parseFloat(display.innerHTML),2));
+		},
+		'FRAC': function() {
+			var temp = 1 / parseFloat(display.innerHTML)
+			if (!isFinite(temp)) {
+				disableButtons();
+				display.style.fontSize = '20px';
+				display.innerHTML = 'Переполнение';
+				this.operationsDisabled = true;
+				return;
+			}
+			display.innerHTML = this.trimmer(temp);
+		},
+		'SQRT': function() {
+			var temp = Math.sqrt(parseFloat(display.innerHTML));
+			if (!isFinite(temp)) {
+				disableButtons();
+				display.style.fontSize = '20px';
+				display.innerHTML = 'Переполнение';
+				this.operationsDisabled = true;
+				return;
+			}
+			display.innerHTML = this.trimmer(temp);
+		},
+		'NEGATE': function() {
+			var temp = parseFloat(display.innerHTML) * -1;
+			if (!isFinite(temp)) {
+				disableButtons();
+				display.style.fontSize = '20px';
+				display.innerHTML = 'Переполнение';
+				this.operationsDisabled = true;
+				return;
+			}
+			display.innerHTML = this.trimmer(temp);
+		},
+		'PERCENT': function() {
+			var temp = parseFloat(display.innerHTML)/100*this.currentValue;
+			if (!isFinite(temp)) {
+				disableButtons();
+				display.style.fontSize = '20px';
+				display.innerHTML = 'Переполнение';
+				this.operationsDisabled = true;
+				return;
+			}
+			if (!this.currentValue) {
+				display.innerHTML = 0;
+				return;
+			}
+			return this.trimmer(temp);
+		},
+		nameOp: {
+			'POW': 'sqr',
+			'FRAC': '1/',
+			'SQRT': '√',
+			'NEGATE': 'negate'
+		}
+	}
+
 	function Calculator() {
 		var self = this;
-		this.ValueForProgressive = undefined;
-		this.currentValue = undefined;
+		this.operationsDisabled = false;
 		this.resultPressed = false;
 		this.operationPressed = false;
 		this.needNewValue = false;
@@ -87,82 +221,10 @@ window.onload = function() {
 		this.pressedSingleOperation = false;
 		this.maxLength = 11;
 		this.singleFunction = false;
-		this.operations = {
-			disabled: false, 
-			'+': function() {
-				if (self.resultPressed) {
-					self.currentValue += self.ValueForProgressive;
-				}
-				else {
-					self.currentValue += parseFloat(display.innerHTML);
-				}
-
-				display.innerHTML = self.trimmer(self.currentValue);
-			},
-			'-': function() {
-				if (self.resultPressed) {
-					self.currentValue -= self.ValueForProgressive;
-				}
-				else {
-					self.currentValue -= parseFloat(display.innerHTML);
-				}
-
-				display.innerHTML = self.trimmer(self.currentValue);
-			},
-			'*': function() {
-				if (self.resultPressed) {
-					self.currentValue *= self.ValueForProgressive;
-				}
-				else {
-					self.currentValue *= parseFloat(display.innerHTML);
-				}
-				display.innerHTML = self.trimmer(self.currentValue);
-			},
-			'÷': function() {
-				if (self.ValueForProgressive === 0 || parseFloat(display.innerHTML) === 0)
-				{	
-					operations.disabled = true;
-					disableButtons();
-					display.style.fontSize = '20px';
-					display.innerHTML = 'Деление на 0 невозможно';
-				} else {
-					if (self.resultPressed) {
-						self.currentValue /= self.ValueForProgressive;
-					}
-					else {
-						self.currentValue /= +display.innerHTML;
-					}
-
-					display.innerHTML = self.trimmer(self.currentValue);
-				} 
-			},
-			'POW': function() {
-				display.innerHTML = self.trimmer(Math.pow(parseFloat(display.innerHTML),2));
-			},
-			'FRAC': function() {
-				display.innerHTML = self.trimmer(1 / parseFloat(display.innerHTML));
-			},
-			'SQRT': function() {
-				display.innerHTML = self.trimmer(Math.sqrt(parseFloat(display.innerHTML)));
-			},
-			'NEGATE': function() {
-				display.innerHTML = self.trimmer(parseFloat(display.innerHTML) * -1);
-			},
-			'PERCENT': function() {
-				if (!currentValue) {
-					display.innerHTML = 0;
-					return;
-				}
-				return self.trimmer(parseFloat(display.innerHTML)/100*currentValue);
-			},
-			nameOp: {
-				'POW': 'sqr',
-				'FRAC': '1/',
-				'SQRT': '√',
-				'NEGATE': 'negate'
-			}
-		}
 	}
+
+	Calculator.prototype = operations;
+	Calculator.prototype.constructor = Calculator;
 
 	Calculator.prototype.trimmer = function(temp) {
 		temp = parseFloat(temp)
@@ -180,9 +242,9 @@ window.onload = function() {
 			return;
 		}
 
-		if (display.innerHTML === 'Деление на 0 невозможно') {
+		if (display.innerHTML === 'Деление на 0 невозможно' || display.innerHTML === 'Переполнение') {
 			display.style.fontSize = '45px';
-			this.operations.disabled = false;
+			this.operationsDisabled = false;
 			display.innerHTML = '0';
 			activateButtons();
 			return;
@@ -192,15 +254,17 @@ window.onload = function() {
 	}
 
 	Calculator.prototype.clear = function() {
-		if (this.operations.disabled) {
+		if (this.operationsDisabled) {
 			display.style.fontSize = '45px';
-			this.operations.disabled = false;
+			this.operationsDisabled = false;
 			activateButtons();
 		}
 
 		display.innerHTML = '0';
 		smallDisplay.innerHTML = '';
 		smallDisplay.style.width = '';
+		hiddenDisplay.innerHTML = '';
+		hiddenDisplay.style.width = '';
 		arrowLeft.style.visibility = 'hidden';
 		arrowRight.style.visibility = 'hidden';
 		this.currentValue = undefined;
@@ -217,26 +281,37 @@ window.onload = function() {
 	}
 
 	Calculator.prototype.singleOperation = function(operation) {
-		if (this.operations.disabled) {
+		if (this.operationsDisabled) {
 			return;
 		}
 		if (!this.pressedSingleOperation) {
 			this.data = smallDisplay.innerHTML;
+			this.dataWidth = smallDisplay.clientWidth;
 			if (operation === 'PERCENT') {
-				this.valueArray.push(this.operations[operation]());
-				smallDisplay.innerHTML += this.valueArray[this.valueArray.length-1];
+				this.valueArray.push(this[operation]());
+				smallDisplay.innerHTML += '&nbsp;' + this.valueArray[this.valueArray.length-1];
 			} else {
-				this.valueArray.push(this.operations.nameOp[operation] + '('+ display.innerHTML +')');
-				smallDisplay.innerHTML += ' ' + this.operations.nameOp[operation] + '('+ display.innerHTML +')';
+				this.valueArray.push(this.nameOp[operation] + '('+ display.innerHTML +')');
+				hiddenDisplay.innerHTML = '&nbsp;' + this.valueArray[this.valueArray.length-1];
+				if ((this.dataWidth + hiddenDisplay.clientWidth) >= 286) {
+					smallDisplay.style.width = this.dataWidth + hiddenDisplay.clientWidth;
+				}
+				smallDisplay.innerHTML += '&nbsp;' + this.nameOp[operation] + '('+ display.innerHTML +')';
 			}
 		} 
 		if (this.pressedSingleOperation) {
 			if (operation === 'PERCENT') {
-				this.valueArray[this.valueArray.length-1] = this.operations[operation]();
-				smallDisplay.innerHTML = this.data + this.valueArray[this.valueArray.length - 1];
+				this.valueArray[this.valueArray.length-1] = this[operation]();
+				smallDisplay.innerHTML = this.data + '&nbsp;' + this.valueArray[this.valueArray.length - 1] + '&nbsp;';
 			} else {
-				this.valueArray[this.valueArray.length-1] = this.operations.nameOp[operation] + '(' + this.valueArray[this.valueArray.length - 1] + ')';
-				smallDisplay.innerHTML = this.data + ' ' + this.valueArray[this.valueArray.length - 1] + ' ';
+				this.valueArray[this.valueArray.length-1] = this.nameOp[operation] + '(' + this.valueArray[this.valueArray.length - 1] + ')';
+				hiddenDisplay.innerHTML = '&nbsp;' + this.valueArray[this.valueArray.length-1] + '&nbsp;';
+				if ((this.dataWidth + hiddenDisplay.clientWidth) >= 286) {
+					arrowLeft.style.visibility = 'visible';
+					arrowRight.style.visibility = 'visible';
+					smallDisplay.style.width = this.dataWidth + hiddenDisplay.clientWidth;
+				} 
+				smallDisplay.innerHTML = this.data + '&nbsp;' + this.valueArray[this.valueArray.length - 1] + '&nbsp;';
 			}
 		}
 
@@ -246,15 +321,15 @@ window.onload = function() {
 		this.enteredNewValue = true;
 
 		if (operation === 'PERCENT') {
-			display.innerHTML = this.operations[operation]();
+			display.innerHTML = this[operation]();
 			return;
 		}
 
-		this.operations[operation]();
+		this[operation]();
 	}
 
 	Calculator.prototype.result = function() {
-		if (this.operations.disabled) {
+		if (this.operationsDisabled) {
 			return;
 		}
 
@@ -269,36 +344,36 @@ window.onload = function() {
 		}
 
 		if ((this.operationPressed || this.resultPressed) && this.currentValue !== undefined) {
-			this.operations[this.typeOperation]();
+			this[this.typeOperation]();
 		}
 
 	}
 
 	Calculator.prototype.operation = function(operation) {
-		if (this.operations.disabled) {
+		if (this.operationsDisabled) {
 			return;
 		}
 
 		if (this.enteredNewValue && this.pressedSingleOperation) {
 			this.valueArray.push(operation);
-			hiddenDisplay.innerHTML = '&nbsp;' + this.valueArray[this.valueArray.length-2] + ' ' + this.valueArray[this.valueArray.length-1] + '&nbsp;';
+			hiddenDisplay.innerHTML = '&nbsp;' + this.valueArray[this.valueArray.length-1];
 			if ((smallDisplay.clientWidth + hiddenDisplay.clientWidth) >= 286) {
 				arrowLeft.style.visibility = 'visible';
 				arrowRight.style.visibility = 'visible';
-				smallDisplay.style.width = smallDisplay.clientWidth + hiddenDisplay.clientWidth;
+				smallDisplay.style.width = smallDisplay.clientWidth + hiddenDisplay.clientWidth + 1;
 			}
 			smallDisplay.innerHTML += this.valueArray[this.valueArray.length-1];
 		} else if (this.enteredNewValue) {
 			this.valueArray.push(display.innerHTML);
 			this.valueArray.push(operation);
-			hiddenDisplay.innerHTML = '&nbsp;' + this.valueArray[this.valueArray.length-2] + ' ' + this.valueArray[this.valueArray.length-1] + '&nbsp;';
+			hiddenDisplay.innerHTML = '&nbsp;' + this.valueArray[this.valueArray.length-2] + '&nbsp;' + this.valueArray[this.valueArray.length-1];
 			if ((smallDisplay.clientWidth + hiddenDisplay.clientWidth) >= 286) {
 				arrowLeft.style.visibility = 'visible';
 				arrowRight.style.visibility = 'visible';
 				smallDisplay.style.width = smallDisplay.clientWidth + hiddenDisplay.clientWidth;
 			}
-			smallDisplay.innerHTML += ' ' + this.valueArray[this.valueArray.length-2];
-			smallDisplay.innerHTML += ' ' + this.valueArray[this.valueArray.length-1];
+			smallDisplay.innerHTML += '&nbsp;' + this.valueArray[this.valueArray.length-2];
+			smallDisplay.innerHTML += '&nbsp;' + this.valueArray[this.valueArray.length-1];
 		}
 		
 		this.valueArray[this.valueArray.length - 1] = operation;	
@@ -308,7 +383,7 @@ window.onload = function() {
 
 		if (this.operationPressed) {
 			if (this.enteredNewValue) {
-				this.operations[this.typeOperation]();
+				this[this.typeOperation]();
 				this.enteredNewValue = false;
 			}
 			this.typeOperation = operation;
@@ -323,7 +398,7 @@ window.onload = function() {
 	}
 
 	Calculator.prototype.addPoint = function(text) {
-		if (this.operations.disabled) {
+		if (this.operationsDisabled) {
 			return;
 		}
 
@@ -342,8 +417,8 @@ window.onload = function() {
 }
 
 Calculator.prototype.numberPress = function(number) {
-	if (this.operations.disabled) {
-		this.operations.disabled = false;
+	if (this.operationsDisabled) {
+		this.operationsDisabled = false;
 		this.clear();
 		activateButtons();
 	}
@@ -369,7 +444,6 @@ Calculator.prototype.numberPress = function(number) {
 		}
 		display.innerHTML += number;
 	}
-
 }
 
 var calc = new Calculator();
