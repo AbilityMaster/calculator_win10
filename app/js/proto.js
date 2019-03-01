@@ -73,6 +73,17 @@ window.onload = function() {
 		});
 	}
 
+	var MESSAGES = {
+		OVERFLOW: 'Переполнение',
+		DIVIDE_BY_ZERO: 'Деление на 0 невозможно',
+		UNCORRECT_DATA: 'Введены неверные данные'
+	};
+
+	var OPERATIONS = {
+		PERCENT: 'PERCENT'
+	}
+
+
 	var	operations = {
 		'+': function() {
 			if (this.resultPressed) {
@@ -84,7 +95,7 @@ window.onload = function() {
 			if (!isFinite(this.currentValue)) {
 				disableButtons();
 				display.style.fontSize = '20px';
-				display.innerHTML = 'Переполнение';
+				display.innerHTML = MESSAGES.OVERFLOW;
 				this.operationsDisabled = true;
 				return;
 			}
@@ -100,7 +111,7 @@ window.onload = function() {
 			if (!isFinite(this.currentValue)) {
 				disableButtons();
 				display.style.fontSize = '20px';
-				display.innerHTML = 'Переполнение';
+				display.innerHTML = MESSAGES.OVERFLOW;
 				this.operationsDisabled = true;
 				return;
 			}
@@ -116,7 +127,7 @@ window.onload = function() {
 			if (!isFinite(this.currentValue)) {
 				disableButtons();
 				display.style.fontSize = '20px';
-				display.innerHTML = 'Переполнение';
+				display.innerHTML = MESSAGES.OVERFLOW;
 				this.operationsDisabled = true;
 				return;
 			}
@@ -128,7 +139,7 @@ window.onload = function() {
 				this.operationsDisabled = true;
 				disableButtons();
 				display.style.fontSize = '20px';
-				display.innerHTML = 'Деление на 0 невозможно';
+				display.innerHTML = MESSAGES.DIVIDE_BY_ZERO;
 				return;
 			} 
 
@@ -146,7 +157,7 @@ window.onload = function() {
 			if (!isFinite(temp)) {
 				disableButtons();
 				display.style.fontSize = '20px';
-				display.innerHTML = 'Переполнение';
+				display.innerHTML = MESSAGES.OVERFLOW;
 				this.operationsDisabled = true;
 				return;
 			}
@@ -157,14 +168,14 @@ window.onload = function() {
 				this.operationsDisabled = true;
 				disableButtons();
 				display.style.fontSize = '20px';
-				display.innerHTML = 'Деление на 0 невозможно';
+				display.innerHTML = MESSAGES.DIVIDE_BY_ZERO;
 				return;
 			} 
 			var temp = 1 / parseFloat(display.innerHTML)
 			if (!isFinite(temp)) {
 				disableButtons();
 				display.style.fontSize = '20px';
-				display.innerHTML = 'Переполнение';
+				display.innerHTML = MESSAGES.OVERFLOW;
 				this.operationsDisabled = true;
 				return;
 			}
@@ -174,7 +185,7 @@ window.onload = function() {
 			if (parseFloat(display.innerHTML) < 0) {
 				disableButtons();
 				display.style.fontSize = '20px';
-				display.innerHTML = 'Введены неверные данные';
+				display.innerHTML =  MESSAGES.UNCORRECT_DATA;
 				this.operationsDisabled = true;
 				return;
 			}
@@ -182,7 +193,7 @@ window.onload = function() {
 			if (!isFinite(temp)) {
 				disableButtons();
 				display.style.fontSize = '20px';
-				display.innerHTML = 'Переполнение';
+				display.innerHTML = MESSAGES.OVERFLOW;
 				this.operationsDisabled = true;
 				return;
 			}
@@ -193,7 +204,7 @@ window.onload = function() {
 			if (!isFinite(temp)) {
 				disableButtons();
 				display.style.fontSize = '20px';
-				display.innerHTML = 'Переполнение';
+				display.innerHTML = MESSAGES.OVERFLOW;
 				this.operationsDisabled = true;
 				return;
 			}
@@ -204,7 +215,7 @@ window.onload = function() {
 			if (!isFinite(temp)) {
 				disableButtons();
 				display.style.fontSize = '20px';
-				display.innerHTML = 'Переполнение';
+				display.innerHTML = MESSAGES.OVERFLOW;
 				this.operationsDisabled = true;
 				return;
 			}
@@ -220,7 +231,7 @@ window.onload = function() {
 			'SQRT': '√',
 			'NEGATE': 'negate'
 		}
-	}
+	};
 
 	function Calculator() {
 		this.operationsDisabled = false;
@@ -256,7 +267,7 @@ window.onload = function() {
 			return;
 		}
 
-		if (display.innerHTML === 'Деление на 0 невозможно' || display.innerHTML === 'Переполнение' || display.innerHTML === 'Введены неверные данные') {
+		if (display.innerHTML === MESSAGES.DIVIDE_BY_ZERO || display.innerHTML === MESSAGES.OVERFLOW || display.innerHTML === MESSAGES.UNCORRECT_DATA) {
 			smallDisplay.innerHTML = '';
 			display.style.fontSize = '45px';
 			this.operationsDisabled = false;
@@ -301,7 +312,7 @@ window.onload = function() {
 		if (!this.pressedSingleOperation) {
 			this.data = smallDisplay.innerHTML;
 			this.dataWidth = smallDisplay.clientWidth;
-			if (operation === 'PERCENT') {
+			if (operation === OPERATIONS.PERCENT) {
 				this.valueArray.push(this[operation]());
 				smallDisplay.innerHTML += '&nbsp;' + this.valueArray[this.valueArray.length-1];
 			} else {
@@ -314,7 +325,7 @@ window.onload = function() {
 			}
 		} 
 		if (this.pressedSingleOperation) {
-			if (operation === 'PERCENT') {
+			if (operation ===  OPERATIONS.PERCENT) {
 				this.valueArray[this.valueArray.length-1] = this[operation]();
 				smallDisplay.innerHTML = this.data + '&nbsp;' + this.valueArray[this.valueArray.length - 1] + '&nbsp;';
 			} else {
@@ -334,7 +345,7 @@ window.onload = function() {
 		this.needNewValue = true;
 		this.enteredNewValue = true;
 
-		if (operation === 'PERCENT') {
+		if (operation ===  OPERATIONS.PERCENT) {
 			display.innerHTML = this[operation]();
 			return;
 		}
@@ -447,7 +458,7 @@ Calculator.prototype.numberPress = function(number) {
 		return;
 	}
 
-	if ((display.innerHTML === '0' || (this.needNewValue) || (this.resultPressed) || display.innerHTML === 'Деление на 0 невозможно')) {
+	if ((display.innerHTML === '0' || (this.needNewValue) || (this.resultPressed) || display.innerHTML === MESSAGES.DIVIDE_BY_ZERO)) {
 		display.innerHTML = number;
 		this.needNewValue = false;
 		this.resultPressed = false;
@@ -510,6 +521,7 @@ document.querySelector('.small-display__button_left').onclick = function() {
 		return;
 	}
 }
+
 document.querySelector('.small-display__button_right').onclick = function() {
 	if (smallDisplay.clientWidth > 286) {
 		smallDisplay.style.removeProperty('left');
