@@ -80,12 +80,19 @@ window.onload = function() {
 	};
 
 	var OPERATIONS = {
+		PLUS: '+',
+		MINUS: '-',
+		MULTIPLY: '*',
+		DIVIDE: '÷',
+		POW: 'POW',
+		FRAC: 'FRAC',
+		SQRT: 'SQRT',
+		NEGATE: 'NEGATE',
 		PERCENT: 'PERCENT'
 	}
 
-
 	var	operations = {
-		'+': function() {
+		[OPERATIONS.PLUS]: function() {
 			if (this.resultPressed) {
 				this.currentValue += this.ValueForProgressive;
 			}
@@ -101,7 +108,7 @@ window.onload = function() {
 			}
 			display.innerHTML = this.trimmer(this.currentValue);
 		},
-		'-': function() {
+		[OPERATIONS.MINUS]: function() {
 			if (this.resultPressed) {
 				this.currentValue -= this.ValueForProgressive;
 			}
@@ -117,7 +124,7 @@ window.onload = function() {
 			}
 			display.innerHTML = this.trimmer(this.currentValue);
 		},
-		'*': function() {
+		[OPERATIONS.MULTIPLY]: function() {
 			if (this.resultPressed) {
 				this.currentValue *= this.ValueForProgressive;
 			}
@@ -133,7 +140,7 @@ window.onload = function() {
 			}
 			display.innerHTML = this.trimmer(this.currentValue);
 		},
-		'÷': function() {
+		[OPERATIONS.DIVIDE]: function() {
 			if (this.ValueForProgressive === 0 || parseFloat(display.innerHTML) === 0)
 			{	
 				this.operationsDisabled = true;
@@ -152,7 +159,7 @@ window.onload = function() {
 
 			display.innerHTML = this.trimmer(this.currentValue);
 		},
-		'POW': function() {
+		[OPERATIONS.POW]: function() {
 			var temp = Math.pow(parseFloat(display.innerHTML),2);
 			if (!isFinite(temp)) {
 				disableButtons();
@@ -163,7 +170,7 @@ window.onload = function() {
 			}
 			display.innerHTML = this.trimmer(Math.pow(parseFloat(display.innerHTML),2));
 		},
-		'FRAC': function() {
+		[OPERATIONS.FRAC]: function() {
 			if (parseFloat(display.innerHTML) === 0)	{	
 				this.operationsDisabled = true;
 				disableButtons();
@@ -181,7 +188,7 @@ window.onload = function() {
 			}
 			display.innerHTML = this.trimmer(temp);
 		},
-		'SQRT': function() {
+		[OPERATIONS.SQRT]: function() {
 			if (parseFloat(display.innerHTML) < 0) {
 				disableButtons();
 				display.style.fontSize = '20px';
@@ -199,7 +206,7 @@ window.onload = function() {
 			}
 			display.innerHTML = this.trimmer(temp);
 		},
-		'NEGATE': function() {
+		[OPERATIONS.NEGATE]: function() {
 			var temp = parseFloat(display.innerHTML) * -1;
 			if (!isFinite(temp)) {
 				disableButtons();
@@ -210,7 +217,7 @@ window.onload = function() {
 			}
 			display.innerHTML = this.trimmer(temp);
 		},
-		'PERCENT': function() {
+		[OPERATIONS.PERCENT]: function() {
 			var temp = parseFloat(display.innerHTML)/100*this.currentValue;
 			if (!isFinite(temp)) {
 				disableButtons();
@@ -226,10 +233,10 @@ window.onload = function() {
 			return this.trimmer(temp);
 		},
 		nameOp: {
-			'POW': 'sqr',
-			'FRAC': '1/',
-			'SQRT': '√',
-			'NEGATE': 'negate'
+			[OPERATIONS.POW]: 'sqr',
+			[OPERATIONS.FRAC]: '1/',
+			[OPERATIONS.SQRT]: '√',
+			[OPERATIONS.NEGATE]: 'negate'
 		}
 	};
 
