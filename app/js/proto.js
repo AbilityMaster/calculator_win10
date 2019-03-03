@@ -1,7 +1,7 @@
 'use strict'
 
 window.onload = function() {
-	var numbers = document.querySelectorAll('.calc__button_number'),
+	const numbers = document.querySelectorAll('.calc__button_number'),
 	display = document.querySelector('.display'),
 	smallDisplay = document.querySelector('.small-display__block'),
 	hiddenDisplay = document.querySelector('.small-display__add'),
@@ -51,7 +51,6 @@ window.onload = function() {
 			element.classList.add('calc__button_disabled');
 		});
 	}
-
 	function activateButtons() {
 		reverse.classList.add('calc__button_enabled');
 		reverse.classList.remove('calc__button_disabled');
@@ -73,175 +72,184 @@ window.onload = function() {
 		});
 	}
 
-	let MESSAGES = {
+	const MESSAGES = {
 		OVERFLOW: 'Переполнение',
 		DIVIDE_BY_ZERO: 'Деление на 0 невозможно',
 		UNCORRECT_DATA: 'Введены неверные данные'
 	};
 
-	let OPERATIONS = {
+	const OPERATIONS = {
+		PLUS: '+',
+		MINUS: '-',
+		MULTIPLY: '*',
+		DIVIDE: '÷',
+		POW: 'POW',
+		FRAC: 'FRAC',
+		SQRT: 'SQRT',
+		NEGATE: 'NEGATE',
 		PERCENT: 'PERCENT'
 	}
 
 	class Operations {
-		constructor() {
-			this.operations = {
-				'+': function() {
-					if (this.resultPressed) {
-						this.currentValue += this.ValueForProgressive;
-					}
-					else {
-						this.currentValue += parseFloat(display.innerHTML);
-					}
-					if (!isFinite(this.currentValue)) {
-						disableButtons();
-						display.style.fontSize = '20px';
-						display.innerHTML = MESSAGES.OVERFLOW;
-						this.operationsDisabled = true;
-						return;
-					}
-					display.innerHTML = this.trimmer(this.currentValue);
-				},
-				'-': function() {
-					if (this.resultPressed) {
-						this.currentValue -= this.ValueForProgressive;
-					}
-					else {
-						this.currentValue -= parseFloat(display.innerHTML);
-					}
-					if (!isFinite(this.currentValue)) {
-						disableButtons();
-						display.style.fontSize = '20px';
-						display.innerHTML = MESSAGES.OVERFLOW;
-						this.operationsDisabled = true;
-						return;
-					}
-					display.innerHTML = this.trimmer(this.currentValue);
-				},
-				'*': function() {
-					if (this.resultPressed) {
-						this.currentValue *= this.ValueForProgressive;
-					}
-					else {
-						this.currentValue *= parseFloat(display.innerHTML);
-					}
-					if (!isFinite(this.currentValue)) {
-						disableButtons();
-						display.style.fontSize = '20px';
-						display.innerHTML = MESSAGES.OVERFLOW;
-						this.operationsDisabled = true;
-						return;
-					}
-					display.innerHTML = this.trimmer(this.currentValue);
-				},
-				'÷': function() {
-					if (this.ValueForProgressive === 0 || parseFloat(display.innerHTML) === 0)
-					{	
-						this.operationsDisabled = true;
-						disableButtons();
-						display.style.fontSize = '20px';
-						display.innerHTML = MESSAGES.DIVIDE_BY_ZERO;
-						return;
-					} 
-
-					if (this.resultPressed) {
-						this.currentValue /= this.ValueForProgressive;
-					}
-					else {
-						this.currentValue /= +display.innerHTML;
-					}
-
-					display.innerHTML = this.trimmer(this.currentValue);
-				},
-				'POW': function() {
-					var temp = Math.pow(parseFloat(display.innerHTML),2);
-					if (!isFinite(temp)) {
-						disableButtons();
-						display.style.fontSize = '20px';
-						display.innerHTML = MESSAGES.OVERFLOW;
-						this.operationsDisabled = true;
-						return;
-					}
-					display.innerHTML = this.trimmer(Math.pow(parseFloat(display.innerHTML),2));
-				},
-				'FRAC': function() {
-					if (parseFloat(display.innerHTML) === 0)	{	
-						this.operationsDisabled = true;
-						disableButtons();
-						display.style.fontSize = '20px';
-						display.innerHTML = MESSAGES.DIVIDE_BY_ZERO;
-						return;
-					} 
-					var temp = 1 / parseFloat(display.innerHTML)
-					if (!isFinite(temp)) {
-						disableButtons();
-						display.style.fontSize = '20px';
-						display.innerHTML = MESSAGES.OVERFLOW;
-						this.operationsDisabled = true;
-						return;
-					}
-					display.innerHTML = this.trimmer(temp);
-				},
-				'SQRT': function() {
-					if (parseFloat(display.innerHTML) < 0) {
-						disableButtons();
-						display.style.fontSize = '20px';
-						display.innerHTML =  MESSAGES.UNCORRECT_DATA;
-						this.operationsDisabled = true;
-						return;
-					}
-					var temp = Math.sqrt(parseFloat(display.innerHTML));
-					if (!isFinite(temp)) {
-						disableButtons();
-						display.style.fontSize = '20px';
-						display.innerHTML = MESSAGES.OVERFLOW;
-						this.operationsDisabled = true;
-						return;
-					}
-					display.innerHTML = this.trimmer(temp);
-				},
-				'NEGATE': function() {
-					var temp = parseFloat(display.innerHTML) * -1;
-					if (!isFinite(temp)) {
-						disableButtons();
-						display.style.fontSize = '20px';
-						display.innerHTML = MESSAGES.OVERFLOW;
-						this.operationsDisabled = true;
-						return;
-					}
-					display.innerHTML = this.trimmer(temp);
-				},
-				'PERCENT': function() {
-					var temp = parseFloat(display.innerHTML)/100*this.currentValue;
-					if (!isFinite(temp)) {
-						disableButtons();
-						display.style.fontSize = '20px';
-						display.innerHTML = MESSAGES.OVERFLOW;
-						this.operationsDisabled = true;
-						return;
-					}
-					if (!this.currentValue) {
-						display.innerHTML = 0;
-						return;
-					}
-					return this.trimmer(temp);
-				},
-				nameOp: {
-					'POW': 'sqr',
-					'FRAC': '1/',
-					'SQRT': '√',
-					'NEGATE': 'negate'
-				}
-
-
+		constructor() {	
+			this.nameOp = {
+				[OPERATIONS.POW]: 'sqr',
+				[OPERATIONS.FRAC]: '1/',
+				[OPERATIONS.SQRT]: '√',
+				[OPERATIONS.NEGATE]: 'negate'
 			}
+		}		
 
-
+		[OPERATIONS.PLUS]() {
+			if (this.resultPressed) {
+				this.currentValue += this.ValueForProgressive;
+			}
+			else {
+				this.currentValue += parseFloat(display.innerHTML);
+			}
+			if (!isFinite(this.currentValue)) {
+				disableButtons();
+				display.style.fontSize = '20px';
+				display.innerHTML = MESSAGES.OVERFLOW;
+				this.operationsDisabled = true;
+				return;
+			}
+			display.innerHTML = this.trimmer(this.currentValue);
 		}
 
+		[OPERATIONS.MINUS]() {
+			if (this.resultPressed) {
+				this.currentValue -= this.ValueForProgressive;
+			}
+			else {   
+				this.currentValue -= parseFloat(display.innerHTML);
+			}
+			if (!isFinite(this.currentValue)) {
+				disableButtons();
+				display.style.fontSize = '20px';
+				display.innerHTML = MESSAGES.OVERFLOW;
+				this.operationsDisabled = true;
+				return;
+			}
+			display.innerHTML = this.trimmer(this.currentValue);
+		}
+
+		[OPERATIONS.MULTIPLY]() {
+			if (this.resultPressed) {
+				this.currentValue *= this.ValueForProgressive;
+			}
+			else {
+				this.currentValue *= parseFloat(display.innerHTML);
+			}
+			if (!isFinite(this.currentValue)) {
+				disableButtons();
+				display.style.fontSize = '20px';
+				display.innerHTML = MESSAGES.OVERFLOW;
+				this.operationsDisabled = true;
+				return;
+			}
+			display.innerHTML = this.trimmer(this.currentValue);
+		}
+
+		[OPERATIONS.DIVIDE]() {
+			if (this.ValueForProgressive === 0 || parseFloat(display.innerHTML) === 0)
+			{	
+				this.operationsDisabled = true;
+				disableButtons();
+				display.style.fontSize = '20px';
+				display.innerHTML = MESSAGES.DIVIDE_BY_ZERO;
+				return;
+			} 
+
+			if (this.resultPressed) {
+				this.currentValue /= this.ValueForProgressive;
+			}
+			else {
+				this.currentValue /= +display.innerHTML;
+			}
+
+			display.innerHTML = this.trimmer(this.currentValue);
+		}
+
+		[OPERATIONS.POW]() {
+			let temp = Math.pow(parseFloat(display.innerHTML),2);
+			if (!isFinite(temp)) {
+				disableButtons();
+				display.style.fontSize = '20px';
+				display.innerHTML = MESSAGES.OVERFLOW;
+				this.operationsDisabled = true;
+				return;
+			}
+			display.innerHTML = this.trimmer(Math.pow(parseFloat(display.innerHTML),2));
+		}
+
+		[OPERATIONS.FRAC]() {
+			if (parseFloat(display.innerHTML) === 0)	{	
+				this.operationsDisabled = true;
+				disableButtons();
+				display.style.fontSize = '20px';
+				display.innerHTML = MESSAGES.DIVIDE_BY_ZERO;
+				return;
+			} 
+			let temp = 1 / parseFloat(display.innerHTML)
+			if (!isFinite(temp)) {
+				disableButtons();
+				display.style.fontSize = '20px';
+				display.innerHTML = MESSAGES.OVERFLOW;
+				this.operationsDisabled = true;
+				return;
+			}
+			display.innerHTML = this.trimmer(temp);
+		}
+
+		[OPERATIONS.SQRT]() {
+			if (parseFloat(display.innerHTML) < 0) {
+				disableButtons();
+				display.style.fontSize = '20px';
+				display.innerHTML =  MESSAGES.UNCORRECT_DATA;
+				this.operationsDisabled = true;
+				return;
+			}
+			let temp = Math.sqrt(parseFloat(display.innerHTML));
+			if (!isFinite(temp)) {
+				disableButtons();
+				display.style.fontSize = '20px';
+				display.innerHTML = MESSAGES.OVERFLOW;
+				this.operationsDisabled = true;
+				return;
+			}
+			display.innerHTML = this.trimmer(temp);
+		}
+
+		[OPERATIONS.NEGATE]() {
+			let temp = parseFloat(display.innerHTML) * -1;
+			if (!isFinite(temp)) {
+				disableButtons();
+				display.style.fontSize = '20px';
+				display.innerHTML = MESSAGES.OVERFLOW;
+				this.operationsDisabled = true;
+				return;
+			}
+			display.innerHTML = this.trimmer(temp);
+		}
+
+		[OPERATIONS.PERCENT]() {
+			let temp = parseFloat(display.innerHTML)/100*this.currentValue;
+			if (!isFinite(temp)) {
+				disableButtons();
+				display.style.fontSize = '20px';
+				display.innerHTML = MESSAGES.OVERFLOW;
+				this.operationsDisabled = true;
+				return;
+			}
+			if (!this.currentValue) {
+				display.innerHTML = 0;
+				return;
+			}
+			return this.trimmer(temp);
+		}
 	}
 
-	
 
 	class Calculator extends Operations {
 		constructor() {
@@ -270,7 +278,7 @@ window.onload = function() {
 		}
 
 		backspace() {
-			var length = display.innerHTML.length;
+			let length = display.innerHTML.length;
 			if (length === 2 && display.innerHTML[0] === '-' || length === 1) {
 				display.innerHTML = '0';
 				return;
@@ -378,7 +386,7 @@ window.onload = function() {
 			}
 
 			if ((this.operationPressed || this.resultPressed) && this.currentValue !== null) {
-				this.operations[this.typeOperation]();
+				this[this.typeOperation]();
 			}
 
 		}
@@ -483,9 +491,7 @@ window.onload = function() {
 
 }
 
-var calc = new Calculator();
-
-console.log(calc);
+let calc = new Calculator();
 
 document.querySelector('.calc__button_get-result').onclick = function() {
 	calc.result();
