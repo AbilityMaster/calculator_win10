@@ -78,6 +78,10 @@ window.onload = function() {
 		DIVIDE_BY_ZERO: 'Деление на 0 невозможно',
 		UNCORRECT_DATA: 'Введены неверные данные'
 	};
+	var STYLES = {
+		SMALL: '20px',
+		NORMAL: '45px' 
+	}
 
 	var OPERATIONS = {
 		PLUS: '+',
@@ -101,7 +105,7 @@ window.onload = function() {
 			}
 			if (!isFinite(this.currentValue)) {
 				disableButtons();
-				display.style.fontSize = '20px';
+				display.style.fontSize = STYLES.SMALL;
 				display.innerHTML = MESSAGES.OVERFLOW;
 				this.operationsDisabled = true;
 				return;
@@ -117,7 +121,7 @@ window.onload = function() {
 			}
 			if (!isFinite(this.currentValue)) {
 				disableButtons();
-				display.style.fontSize = '20px';
+				display.style.fontSize = STYLES.SMALL;
 				display.innerHTML = MESSAGES.OVERFLOW;
 				this.operationsDisabled = true;
 				return;
@@ -133,7 +137,7 @@ window.onload = function() {
 			}
 			if (!isFinite(this.currentValue)) {
 				disableButtons();
-				display.style.fontSize = '20px';
+				display.style.fontSize = STYLES.SMALL;
 				display.innerHTML = MESSAGES.OVERFLOW;
 				this.operationsDisabled = true;
 				return;
@@ -145,7 +149,7 @@ window.onload = function() {
 			{	
 				this.operationsDisabled = true;
 				disableButtons();
-				display.style.fontSize = '20px';
+				display.style.fontSize = STYLES.SMALL;
 				display.innerHTML = MESSAGES.DIVIDE_BY_ZERO;
 				return;
 			} 
@@ -163,7 +167,7 @@ window.onload = function() {
 			var temp = Math.pow(parseFloat(display.innerHTML),2);
 			if (!isFinite(temp)) {
 				disableButtons();
-				display.style.fontSize = '20px';
+				display.style.fontSize = STYLES.SMALL;
 				display.innerHTML = MESSAGES.OVERFLOW;
 				this.operationsDisabled = true;
 				return;
@@ -174,14 +178,14 @@ window.onload = function() {
 			if (parseFloat(display.innerHTML) === 0)	{	
 				this.operationsDisabled = true;
 				disableButtons();
-				display.style.fontSize = '20px';
+				display.style.fontSize = STYLES.SMALL;
 				display.innerHTML = MESSAGES.DIVIDE_BY_ZERO;
 				return;
 			} 
 			var temp = 1 / parseFloat(display.innerHTML)
 			if (!isFinite(temp)) {
 				disableButtons();
-				display.style.fontSize = '20px';
+				display.style.fontSize = STYLES.SMALL;
 				display.innerHTML = MESSAGES.OVERFLOW;
 				this.operationsDisabled = true;
 				return;
@@ -191,7 +195,7 @@ window.onload = function() {
 		[OPERATIONS.SQRT]: function() {
 			if (parseFloat(display.innerHTML) < 0) {
 				disableButtons();
-				display.style.fontSize = '20px';
+				display.style.fontSize = STYLES.SMALL;
 				display.innerHTML =  MESSAGES.UNCORRECT_DATA;
 				this.operationsDisabled = true;
 				return;
@@ -199,7 +203,7 @@ window.onload = function() {
 			var temp = Math.sqrt(parseFloat(display.innerHTML));
 			if (!isFinite(temp)) {
 				disableButtons();
-				display.style.fontSize = '20px';
+				display.style.fontSize = STYLES.SMALL;
 				display.innerHTML = MESSAGES.OVERFLOW;
 				this.operationsDisabled = true;
 				return;
@@ -210,7 +214,7 @@ window.onload = function() {
 			var temp = parseFloat(display.innerHTML) * -1;
 			if (!isFinite(temp)) {
 				disableButtons();
-				display.style.fontSize = '20px';
+				display.style.fontSize = STYLES.SMALL;
 				display.innerHTML = MESSAGES.OVERFLOW;
 				this.operationsDisabled = true;
 				return;
@@ -221,7 +225,7 @@ window.onload = function() {
 			var temp = parseFloat(display.innerHTML)/100*this.currentValue;
 			if (!isFinite(temp)) {
 				disableButtons();
-				display.style.fontSize = '20px';
+				display.style.fontSize = STYLES.SMALL;
 				display.innerHTML = MESSAGES.OVERFLOW;
 				this.operationsDisabled = true;
 				return;
@@ -276,7 +280,7 @@ window.onload = function() {
 
 		if (display.innerHTML === MESSAGES.DIVIDE_BY_ZERO || display.innerHTML === MESSAGES.OVERFLOW || display.innerHTML === MESSAGES.UNCORRECT_DATA) {
 			smallDisplay.innerHTML = '';
-			display.style.fontSize = '45px';
+			display.style.fontSize = STYLES.NORMAL;
 			this.operationsDisabled = false;
 			display.innerHTML = '0';
 			activateButtons();
@@ -288,7 +292,7 @@ window.onload = function() {
 
 	Calculator.prototype.clear = function() {
 		if (this.operationsDisabled) {
-			display.style.fontSize = '45px';
+			display.style.fontSize = STYLES.NORMAL;
 			this.operationsDisabled = false;
 			activateButtons();
 		}
@@ -456,7 +460,7 @@ Calculator.prototype.numberPress = function(number) {
 	}
 
 	this.enteredNewValue = true;
-	display.style.fontSize = '45px';
+	display.style.fontSize = STYLES.NORMAL;
 
 	if (display.innerHTML === '0.') {
 		display.innerHTML += number;
