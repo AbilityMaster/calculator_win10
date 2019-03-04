@@ -16,13 +16,14 @@ window.onload = function() {
 	arrowLeft = document.querySelector('.small-display__button_left'),
 	arrowRight = document.querySelector('.small-display__button_right');
 
-	numbers.forEach(function(element){
+	numbers.forEach(element => {
 		element.addEventListener('click', function() {
 			calc.numberPress(this.innerHTML);
 			smallDisplay.style.removeProperty('left');
 			smallDisplay.style.right = 0;
 		});
 	});
+
 	operationList.forEach(function(element){
 		element.addEventListener('click', function() {
 			calc.operation(this.innerHTML);
@@ -78,6 +79,11 @@ window.onload = function() {
 		UNCORRECT_DATA: 'Введены неверные данные'
 	};
 
+	const STYLES = {
+		SMALL: '20px',
+		NORMAL: '45px'
+	};
+
 	const OPERATIONS = {
 		PLUS: '+',
 		MINUS: '-',
@@ -88,7 +94,7 @@ window.onload = function() {
 		SQRT: 'SQRT',
 		NEGATE: 'NEGATE',
 		PERCENT: 'PERCENT'
-	}
+	};
 
 	class Operations {
 		constructor() {	
@@ -109,14 +115,14 @@ window.onload = function() {
 			}
 			if (!isFinite(this.currentValue)) {
 				disableButtons();
-				display.style.fontSize = '20px';
+				display.style.fontSize = STYLES.SMALL;
 				display.innerHTML = MESSAGES.OVERFLOW;
 				this.operationsDisabled = true;
 				return;
 			}
 			display.innerHTML = this.trimmer(this.currentValue);
 		}
-
+		
 		[OPERATIONS.MINUS]() {
 			if (this.resultPressed) {
 				this.currentValue -= this.ValueForProgressive;
@@ -126,7 +132,7 @@ window.onload = function() {
 			}
 			if (!isFinite(this.currentValue)) {
 				disableButtons();
-				display.style.fontSize = '20px';
+				display.style.fontSize = STYLES.SMALL;
 				display.innerHTML = MESSAGES.OVERFLOW;
 				this.operationsDisabled = true;
 				return;
@@ -143,7 +149,7 @@ window.onload = function() {
 			}
 			if (!isFinite(this.currentValue)) {
 				disableButtons();
-				display.style.fontSize = '20px';
+				display.style.fontSize = STYLES.SMALL;
 				display.innerHTML = MESSAGES.OVERFLOW;
 				this.operationsDisabled = true;
 				return;
@@ -156,7 +162,7 @@ window.onload = function() {
 			{	
 				this.operationsDisabled = true;
 				disableButtons();
-				display.style.fontSize = '20px';
+				display.style.fontSize = STYLES.SMALL;
 				display.innerHTML = MESSAGES.DIVIDE_BY_ZERO;
 				return;
 			} 
@@ -175,7 +181,7 @@ window.onload = function() {
 			let temp = Math.pow(parseFloat(display.innerHTML),2);
 			if (!isFinite(temp)) {
 				disableButtons();
-				display.style.fontSize = '20px';
+				display.style.fontSize = STYLES.SMALL;
 				display.innerHTML = MESSAGES.OVERFLOW;
 				this.operationsDisabled = true;
 				return;
@@ -187,14 +193,14 @@ window.onload = function() {
 			if (parseFloat(display.innerHTML) === 0)	{	
 				this.operationsDisabled = true;
 				disableButtons();
-				display.style.fontSize = '20px';
+				display.style.fontSize = STYLES.SMALL;
 				display.innerHTML = MESSAGES.DIVIDE_BY_ZERO;
 				return;
 			} 
 			let temp = 1 / parseFloat(display.innerHTML)
 			if (!isFinite(temp)) {
 				disableButtons();
-				display.style.fontSize = '20px';
+				display.style.fontSize = STYLES.SMALL;
 				display.innerHTML = MESSAGES.OVERFLOW;
 				this.operationsDisabled = true;
 				return;
@@ -205,7 +211,7 @@ window.onload = function() {
 		[OPERATIONS.SQRT]() {
 			if (parseFloat(display.innerHTML) < 0) {
 				disableButtons();
-				display.style.fontSize = '20px';
+				display.style.fontSize = STYLES.SMALL;
 				display.innerHTML =  MESSAGES.UNCORRECT_DATA;
 				this.operationsDisabled = true;
 				return;
@@ -213,7 +219,7 @@ window.onload = function() {
 			let temp = Math.sqrt(parseFloat(display.innerHTML));
 			if (!isFinite(temp)) {
 				disableButtons();
-				display.style.fontSize = '20px';
+				display.style.fontSize = STYLES.SMALL;
 				display.innerHTML = MESSAGES.OVERFLOW;
 				this.operationsDisabled = true;
 				return;
@@ -225,7 +231,7 @@ window.onload = function() {
 			let temp = parseFloat(display.innerHTML) * -1;
 			if (!isFinite(temp)) {
 				disableButtons();
-				display.style.fontSize = '20px';
+				display.style.fontSize = STYLES.SMALL;
 				display.innerHTML = MESSAGES.OVERFLOW;
 				this.operationsDisabled = true;
 				return;
@@ -237,7 +243,7 @@ window.onload = function() {
 			let temp = parseFloat(display.innerHTML)/100*this.currentValue;
 			if (!isFinite(temp)) {
 				disableButtons();
-				display.style.fontSize = '20px';
+				display.style.fontSize = STYLES.SMALL;
 				display.innerHTML = MESSAGES.OVERFLOW;
 				this.operationsDisabled = true;
 				return;
@@ -286,7 +292,7 @@ window.onload = function() {
 
 			if (display.innerHTML === MESSAGES.DIVIDE_BY_ZERO || display.innerHTML === MESSAGES.OVERFLOW || display.innerHTML === MESSAGES.UNCORRECT_DATA) {
 				smallDisplay.innerHTML = '';
-				display.style.fontSize = '45px';
+				display.style.fontSize = STYLES.NORMAL;
 				this.operationsDisabled = false;
 				display.innerHTML = '0';
 				activateButtons();
@@ -298,7 +304,7 @@ window.onload = function() {
 
 		clear() {
 			if (this.operationsDisabled) {
-				display.style.fontSize = '45px';
+				display.style.fontSize = STYLES.NORMAL;
 				this.operationsDisabled = false;
 				activateButtons();
 			}
@@ -467,7 +473,7 @@ window.onload = function() {
 		}
 
 		this.enteredNewValue = true;
-		display.style.fontSize = '45px';
+		display.style.fontSize = STYLES.NORMAL;
 
 		if (display.innerHTML === '0.') {
 			display.innerHTML += number;
